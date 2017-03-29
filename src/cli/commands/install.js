@@ -569,7 +569,7 @@ export class Install {
     for (const dependency in lockfile) {
       const resolved = lockfile[dependency].resolved;
       if (resolved) {
-        requiredTarballs.add(resolved.split('#')[0]);
+        requiredTarballs.add(path.basename(resolved.split('#')[0]));
       }
     }
 
@@ -784,5 +784,6 @@ export async function wrapLifecycle(config: Config, flags: Object, factory: () =
 
   if (!config.production) {
     await config.executeLifecycleScript('prepublish');
+    await config.executeLifecycleScript('prepare');
   }
 }
