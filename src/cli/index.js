@@ -83,6 +83,10 @@ commander.option(
   '--no-emoji',
   'disable emoji in output',
 );
+commander.option(
+  '-s, --silent',
+  'skip Yarn console logs, other types of logs (script output) will be printed',
+);
 commander.option('--proxy <host>', '');
 commander.option('--https-proxy <host>', '');
 commander.option(
@@ -90,6 +94,7 @@ commander.option(
   'disable progress bar',
 );
 commander.option('--network-concurrency <number>', 'maximum number of concurrent network requests', parseInt);
+commander.option('--network-timeout <milliseconds>', 'TCP timeout for network requests', parseInt);
 commander.option('--non-interactive', 'do not show interactive prompts');
 
 // get command name
@@ -187,10 +192,11 @@ const reporter = new Reporter({
   emoji: commander.emoji && process.stdout.isTTY && process.platform === 'darwin',
   verbose: commander.verbose,
   noProgress: !commander.progress,
+  isSilent: commander.silent,
 });
+
 reporter.initPeakMemoryCounter();
 
-//
 const config = new Config(reporter);
 
 // print header
