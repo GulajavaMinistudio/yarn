@@ -6,6 +6,7 @@ import {run as cache} from '../../../src/cli/commands/cache.js';
 import {run as check} from '../../../src/cli/commands/check.js';
 import * as constants from '../../../src/constants.js';
 import * as reporters from '../../../src/reporters/index.js';
+import {parse} from '../../../src/lockfile/wrapper.js';
 import {Install} from '../../../src/cli/commands/install.js';
 import Lockfile from '../../../src/lockfile/wrapper.js';
 import * as fs from '../../../src/util/fs.js';
@@ -154,6 +155,22 @@ test.concurrent("production mode with deduped dev dep shouldn't be removed", asy
     expect(
       await fs.exists(path.join(config.cwd, 'node_modules', 'b')),
     ).toEqual(false);
+  });
+});
+
+test.concurrent("production mode dep on package in dev deps shouldn't be removed", async () => {
+  await runInstall({production: true}, 'install-prod-deduped-direct-dev-dep', async (config) => {
+    expect(
+      (await fs.readJson(path.join(config.cwd, 'node_modules', 'a', 'package.json'))).version,
+    ).toEqual('1.0.0');
+
+    expect(
+      (await fs.readJson(path.join(config.cwd, 'node_modules', 'b', 'package.json'))).version,
+    ).toEqual('1.0.0');
+
+    expect(
+      (await fs.readJson(path.join(config.cwd, 'node_modules', 'c', 'package.json'))).version,
+    ).toEqual('1.0.0');
   });
 });
 
@@ -580,6 +597,42 @@ if (process.platform !== 'win32') {
   });
 }
 
+test.concurrent('offline mirror can be enabled from parent dir', (): Promise<void> => {
+  const fixture = {source: 'offline-mirror-configuration', cwd: 'enabled-from-parent'};
+  return runInstall({}, fixture, async (config, reporter) => {
+    const rawLockfile = await fs.readFile(path.join(config.cwd, 'yarn.lock'));
+    const lockfile = parse(rawLockfile);
+    expect(lockfile['mime-types@2.1.14'].resolved).toEqual(
+      'https://registry.yarnpkg.com/mime-types/-/mime-types-2.1.14.tgz#f7ef7d97583fcaf3b7d282b6f8b5679dab1e94ee',
+    );
+    expect(await fs.exists(path.join(config.cwd, '../offline-mirror/mime-types-2.1.14.tgz'))).toBe(true);
+  });
+});
+
+test.concurrent('offline mirror can be enabled from parent dir, with merging of own .yarnrc', (): Promise<void> => {
+  const fixture = {source: 'offline-mirror-configuration', cwd: 'enabled-from-parent-merge'};
+  return runInstall({}, fixture, async (config, reporter) => {
+    const rawLockfile = await fs.readFile(path.join(config.cwd, 'yarn.lock'));
+    const lockfile = parse(rawLockfile);
+    expect(lockfile['mime-types@2.1.14'].resolved).toEqual(
+      'https://registry.yarnpkg.com/mime-types/-/mime-types-2.1.14.tgz#f7ef7d97583fcaf3b7d282b6f8b5679dab1e94ee',
+    );
+    expect(await fs.exists(path.join(config.cwd, '../offline-mirror/mime-types-2.1.14.tgz'))).toBe(true);
+  });
+});
+
+test.concurrent('offline mirror can be disabled locally', (): Promise<void> => {
+  const fixture = {source: 'offline-mirror-configuration', cwd: 'disabled-locally'};
+  return runInstall({}, fixture, async (config, reporter) => {
+    const rawLockfile = await fs.readFile(path.join(config.cwd, 'yarn.lock'));
+    const lockfile = parse(rawLockfile);
+    expect(lockfile['mime-types@2.1.14'].resolved).toEqual(
+      'https://registry.yarnpkg.com/mime-types/-/mime-types-2.1.14.tgz#f7ef7d97583fcaf3b7d282b6f8b5679dab1e94ee',
+    );
+    expect(await fs.exists(path.join(config.cwd, '../offline-mirror/mime-types-2.1.14.tgz'))).toBe(false);
+  });
+});
+
 // sync test because we need to get all the requests to confirm their validity
 test('install a scoped module from authed private registry', (): Promise<void> => {
   return runInstall({noLockfile: true}, 'install-from-authed-private-registry', async (config) => {
@@ -798,5 +851,17 @@ test.concurrent('prunes the offline mirror after pruning is enabled', (): Promis
     // so the next install should remove dep-a-1.0.0.tgz and dep-b-1.0.0.tgz.
     expect(await fs.exists(path.join(config.cwd, `${mirrorPath}/dep-a-1.0.0.tgz`))).toEqual(false);
     expect(await fs.exists(path.join(config.cwd, `${mirrorPath}/dep-b-1.0.0.tgz`))).toEqual(false);
+  });
+});
+
+test.concurrent('bailout should work with --production flag too', (): Promise<void> => {
+  return runInstall({production: true}, 'bailout-prod', async (config, reporter): Promise<void> => {
+    // remove file
+    await fs.unlink(path.join(config.cwd, 'node_modules', 'left-pad', 'index.js'));
+    // run install again
+    const reinstall = new Install({production: true}, config, reporter, await Lockfile.fromDirectory(config.cwd));
+    await reinstall.init();
+    // don't expect file being recreated because install should have bailed out
+    expect(await fs.exists(path.join(config.cwd, 'node_modules', 'left-pad', 'index.js'))).toBe(false);
   });
 });
