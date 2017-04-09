@@ -32,7 +32,6 @@
     "request": "^2.81.0",
     "request-capture-har": "^1.2.2",
     "rimraf": "^2.5.0",
-    "roadrunner": "^1.1.0",
     "semver": "^5.1.0",
     "strip-bom": "^3.0.0",
     "tar-fs": "^1.15.1",
@@ -92,7 +91,9 @@
     "test-only": "jest --coverage --verbose",
     "lint": "eslint . && flow check",
     "release-branch": "./scripts/release-branch.sh",
-    "build-dist": "./scripts/build-dist.sh",
+    "build-bundle": "node ./scripts/build-webpack.js",
+    "build-deb": "./scripts/build-deb.sh",
+    "build-dist": "bash ./scripts/build-dist.sh",
     "build-chocolatey": "powershell ./scripts/build-chocolatey.ps1",
     "build-win-installer": "scripts\\build-windows-installer.bat"
   },
