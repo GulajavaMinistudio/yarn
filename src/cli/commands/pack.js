@@ -70,7 +70,7 @@ export async function pack(config: Config, dir: string): Promise<stream$Duplex> 
   const pkg = await config.readRootManifest();
   const {bundledDependencies, files: onlyFiles} = pkg;
 
-  // inlude required files
+  // include required files
   let filters: Array<IgnoreFilter> = NEVER_IGNORE.slice();
   // include default filters unless `files` is used
   if (!onlyFiles) {
@@ -113,10 +113,10 @@ export async function pack(config: Config, dir: string): Promise<stream$Duplex> 
     }
   }
 
-  // files to definently keep, takes precedence over ignore filter
+  // files to definitely keep, takes precedence over ignore filter
   const keepFiles: Set<string> = new Set();
 
-  // files to definently ignore
+  // files to definitely ignore
   const ignoredFiles: Set<string> = new Set();
 
   // list of files that didn't match any of our patterns, if a directory in the chain above was matched
