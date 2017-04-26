@@ -239,6 +239,12 @@ export class Install {
         if (ignoreUnusedPatterns && !isUsed) {
           return;
         }
+        // We only take unused dependencies into consideration to get deterministic hoisting.
+        // Since flat mode doesn't care about hoisting and everything is top level and specified then we can safely
+        // leave these out.
+        if (this.flags.flat && !isUsed) {
+          return;
+        }
         const depMap = json[depType];
         for (const name in depMap) {
           if (excludeNames.indexOf(name) >= 0) {
@@ -329,12 +335,6 @@ export class Install {
       return true;
     }
 
-    const {artifacts} = match;
-    if (artifacts) {
-      this.linker.setArtifacts(artifacts);
-      this.scripts.setArtifacts(artifacts);
-    }
-
     return false;
   }
 
@@ -391,6 +391,12 @@ export class Install {
       ignorePatterns,
     } = await this.fetchRequestFromCwd();
     let topLevelPatterns: Array<string> = [];
+
+    const artifacts = await this.integrityChecker.getArtifacts();
+    if (artifacts) {
+      this.linker.setArtifacts(artifacts);
+      this.scripts.setArtifacts(artifacts);
+    }
 
     steps.push(async (curr: number, total: number) => {
       this.reporter.step(curr, total, this.reporter.lang('resolvingPackages'), emoji.get('mag'));
