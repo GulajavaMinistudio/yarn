@@ -205,6 +205,9 @@ const messages = {
   cleanRemovedFiles: 'Removed $0 files',
   cleanSavedSize: 'Saved $0 MB.',
 
+  configFileFound: 'Found configuration file $0.',
+  configPossibleFile: 'Checking for configuration file $0.',
+
   npmUsername: 'npm username',
   npmPassword: 'npm password',
   npmEmail: 'npm email',
@@ -254,8 +257,8 @@ const messages = {
   lockfileNotContainPattern: 'Lockfile does not contain pattern: $0',
   integrityCheckFailed: 'Integrity check failed',
   noIntegrityFile: 'Couldn\'t find an integrity file',
+  integrityFailedExpectedIsNotAJSON: 'Integrity check: integrity file is not a json',
   integrityCheckLinkedModulesDontMatch: 'Integrity check: Linked modules don\'t match',
-  integrityPatternsDontMatch: 'Integrity check: Patterns don\'t match',
   integrityFlagsDontMatch: 'Integrity check: Flags don\'t match',
   integrityLockfilesDontMatch: 'Integrity check: Lock files don\'t match',
   integrityFailedFilesMissing: 'Integrity check: Files are missing',
