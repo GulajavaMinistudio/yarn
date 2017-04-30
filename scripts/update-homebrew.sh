@@ -3,7 +3,14 @@
 
 set -ex
 
-version=`curl --fail https://yarnpkg.com/latest-version`
+# See if YARN_VERSION was passed in the environment, otherwise get version
+# number from Yarn site
+if [ -z "$YARN_VERSION" ]; then
+  echo 'Getting Yarn version from https://yarnpkg.com/latest-version'
+  version=`curl --fail https://yarnpkg.com/latest-version`
+else
+  version="$YARN_VERSION"
+fi
 
 # Ensure Linuxbrew is on the PATH
 PATH=$PATH:$HOME/.linuxbrew/bin/
@@ -11,6 +18,9 @@ PATH=$PATH:$HOME/.linuxbrew/bin/
 pushd ~/.linuxbrew/Library/Taps/homebrew/homebrew-core
 #git remote set-url origin https://github.com/Daniel15/homebrew-core # for testing
 git remote set-url origin https://github.com/homebrew/homebrew-core
+git reset --hard HEAD
+git clean -fd
+git fetch --prune origin
 # Remove any existing branch (eg. if the previous attempt failed)
 git branch -D yarn-$version || true
 popd
