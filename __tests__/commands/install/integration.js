@@ -526,25 +526,6 @@ test.concurrent(
   },
 );
 
-// disabled to resolve https://github.com/yarnpkg/yarn/pull/1210
-test.skip('install should hoist nested bin scripts', (): Promise<void> => {
-  return runInstall({binLinks: true}, 'install-nested-bin', async (config) => {
-    const binScripts = await fs.walk(path.join(config.cwd, 'node_modules', '.bin'));
-    // need to double the amount as windows makes 2 entries for each dependency
-    // so for below, there would be an entry for eslint and eslint.cmd on win32
-    const amount = process.platform === 'win32' ? 20 : 10;
-    expect(binScripts).toHaveLength(amount);
-    expect(binScripts.findIndex((f) => f.basename === 'eslint')).toBeGreaterThanOrEqual(0);
-  });
-});
-
-test.concurrent('install should respect --no-bin-links flag', (): Promise<void> => {
-  return runInstall({binLinks: false}, 'install-nested-bin', async (config) => {
-    const binExists = await fs.exists(path.join(config.cwd, 'node_modules', '.bin'));
-    expect(binExists).toBeFalsy();
-  });
-});
-
 test.concurrent('install should update a dependency to yarn and mirror (PR import scenario 2)', (): Promise<void> => {
   // mime-types@2.0.0 is gets updated to mime-types@2.1.11 via
   // a change in package.json,
@@ -873,6 +854,19 @@ test.concurrent('prunes the offline mirror after pruning is enabled', (): Promis
     // so the next install should remove dep-a-1.0.0.tgz and dep-b-1.0.0.tgz.
     expect(await fs.exists(path.join(config.cwd, `${mirrorPath}/dep-a-1.0.0.tgz`))).toEqual(false);
     expect(await fs.exists(path.join(config.cwd, `${mirrorPath}/dep-b-1.0.0.tgz`))).toEqual(false);
+  });
+});
+
+test.concurrent('scoped packages remain in offline mirror after pruning is enabled', (): Promise<void> => {
+  return runInstall({}, 'prune-offline-mirror-scoped', async (config): Promise<void> => {
+    const mirrorPath = 'mirror-for-offline';
+    // Ensure that scoped packages remain mangled and resolvable
+    expect(
+      await fs.exists(path.join(config.cwd, `${mirrorPath}/@fakescope-fake-dependency-1.0.1.tgz`)))
+      .toEqual(true, 'scoped package exists');
+    expect(
+      await fs.exists(path.join(config.cwd, `${mirrorPath}/fake-dependency-1.0.1.tgz`)))
+      .toEqual(true, 'unscoped package exists');
   });
 });
 
