@@ -98,7 +98,7 @@ export default class TarballFetcher extends BaseFetcher {
           });
         } else {
           reject(new SecurityError(
-            this.config.reporter.lang('fetchBadHash', expectHash, actualHash),
+            this.config.reporter.lang('fetchBadHashWithPath', this.remote.reference, expectHash, actualHash),
           ));
         }
       });
@@ -178,7 +178,7 @@ export default class TarballFetcher extends BaseFetcher {
           .pipe(extractorStream)
           .on('error', reject);
       },
-    });
+    }, this.packageName);
   }
 
   async _fetch(): Promise<FetchedOverride> {
