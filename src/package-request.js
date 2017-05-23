@@ -32,6 +32,7 @@ export default class PackageRequest {
     this.optional = req.optional;
     this.pattern = req.pattern;
     this.config = resolver.config;
+    this.foundInfo = null;
 
     resolver.usedRegistries.add(req.registry);
   }
@@ -54,6 +55,7 @@ export default class PackageRequest {
   config: Config;
   registry: ResolverRegistryNames;
   optional: boolean;
+  foundInfo: ?Manifest;
 
   getParentNames(): Array<string> {
     const chain = [];
@@ -215,28 +217,47 @@ export default class PackageRequest {
    * the registry.
    */
 
-  async findVersionInfo(): Promise<Manifest> {
+  findVersionInfo(): Promise<Manifest> {
     const exoticResolver = PackageRequest.getExoticResolver(this.pattern);
     if (exoticResolver) {
-      return await this.findExoticVersionInfo(exoticResolver, this.pattern);
+      return this.findExoticVersionInfo(exoticResolver, this.pattern);
     } else {
-      return await this.findVersionOnRegistry(this.pattern);
+      return this.findVersionOnRegistry(this.pattern);
     }
   }
 
   reportResolvedRangeMatch(info: Manifest, resolved: Manifest) {}
 
   /**
+   * Do the final resolve of a package that had a match with an existing version.
+   * After all unique versions have been discovered, so the best available version
+   * is found.
+   */
+  resolveToExistingVersion(info: Manifest) {
+    // get final resolved version
+    const {range, name} = PackageRequest.normalizePattern(this.pattern);
+    const resolved: ?Manifest = this.resolver.getHighestRangeVersionMatch(name, range);
+    invariant(resolved, 'should have a resolved reference');
+
+    this.reportResolvedRangeMatch(info, resolved);
+    const ref = resolved._reference;
+    invariant(ref, 'Resolved package info has no package reference');
+    ref.addRequest(this);
+    ref.addPattern(this.pattern, resolved);
+  }
+
+  /**
    * TODO description
    */
-
-  async find(): Promise<void> {
+  async find(fresh: boolean): Promise<void> {
     // find version info for this package pattern
     const info: ?Manifest = await this.findVersionInfo();
+
     if (!info) {
       throw new MessageError(this.reporter.lang('unknownPackage', this.pattern));
     }
 
+    info.fresh = fresh;
     cleanDependencies(info, false, this.reporter, () => {
       // swallow warnings
     });
@@ -246,11 +267,7 @@ export default class PackageRequest {
     const {range, name} = PackageRequest.normalizePattern(this.pattern);
     const resolved: ?Manifest = this.resolver.getHighestRangeVersionMatch(name, range);
     if (resolved) {
-      this.reportResolvedRangeMatch(info, resolved);
-      const ref = resolved._reference;
-      invariant(ref, 'Resolved package info has no package reference');
-      ref.addRequest(this);
-      ref.addPattern(this.pattern, resolved);
+      this.resolver.reportPackageWithExistingVersion(this, info);
       return;
     }
 
