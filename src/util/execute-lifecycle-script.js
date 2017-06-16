@@ -138,9 +138,12 @@ export async function executeLifecycleScript(
     path.join(path.dirname(process.execPath), '..', 'lib', 'node_modules', 'npm', 'bin', 'node-gyp-bin'),
   );
 
-  // Add global bin folder, as some packages depend on a globally-installed
-  // version of node-gyp.
-  pathParts.unshift(getGlobalBinFolder(config, {}));
+  // Add global bin folder if it is not present already, as some packages depend
+  // on a globally-installed version of node-gyp.
+  const globalBin = getGlobalBinFolder(config, {});
+  if (pathParts.indexOf(globalBin) === -1) {
+    pathParts.unshift(globalBin);
+  }
 
   // add .bin folders to PATH
   for (const registry of Object.keys(registries)) {
@@ -150,6 +153,10 @@ export async function executeLifecycleScript(
   }
 
   await checkForGypIfNeeded(config, cmd, pathParts);
+
+  if (config.scriptsPrependNodePath) {
+    pathParts.unshift(path.join(path.dirname(process.execPath)));
+  }
 
   // join path back together
   env[constants.ENV_PATH_KEY] = pathParts.join(path.delimiter);
