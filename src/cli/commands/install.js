@@ -412,6 +412,7 @@ export class Install {
       patterns: rawPatterns,
       ignorePatterns,
       workspaceLayout,
+      manifest,
     } = await this.fetchRequestFromCwd();
     let topLevelPatterns: Array<string> = [];
 
@@ -419,6 +420,13 @@ export class Install {
     if (artifacts) {
       this.linker.setArtifacts(artifacts);
       this.scripts.setArtifacts(artifacts);
+    }
+
+    if (!this.flags.ignoreEngines && typeof manifest.engines === 'object') {
+      steps.push(async (curr: number, total: number) => {
+        this.reporter.step(curr, total, this.reporter.lang('checkingManifest'), emoji.get('mag'));
+        await compatibility.checkOne({_reference: {}, ...manifest}, this.config, this.flags.ignoreEngines);
+      });
     }
 
     steps.push(async (curr: number, total: number) => {
@@ -637,11 +645,6 @@ export class Install {
    */
 
   async saveLockfileAndIntegrity(patterns: Array<string>, workspaceLayout: ?WorkspaceLayout): Promise<void> {
-    // --no-lockfile or --pure-lockfile flag
-    if (this.flags.lockfile === false || this.flags.pureLockfile) {
-      return;
-    }
-
     const resolvedPatterns: {[packagePattern: string]: Manifest} = {};
     Object.keys(this.resolver.patterns).forEach(pattern => {
       if (!workspaceLayout || !workspaceLayout.getManifestByPattern(pattern)) {
@@ -666,6 +669,11 @@ export class Install {
       this.resolver.usedRegistries,
       this.scripts.getArtifacts(),
     );
+
+    // --no-lockfile or --pure-lockfile flag
+    if (this.flags.lockfile === false || this.flags.pureLockfile) {
+      return;
+    }
 
     const lockFileHasAllPatterns = patterns.every(p => this.lockfile.getLocked(p));
     const resolverPatternsAreSameAsInLockfile = Object.keys(lockfileBasedOnResolver).every(pattern => {
