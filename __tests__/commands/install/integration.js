@@ -61,6 +61,15 @@ test.concurrent('properly find and save build artifacts', async () => {
   });
 });
 
+test('reading a lockfile should not optimize it', async () => {
+  await runInstall({}, 'lockfile-optimization', async (config, reporter): Promise<void> => {
+    const was = await fs.readFile(`${__dirname}/../../fixtures/install/lockfile-optimization/yarn.lock`);
+    const is = await fs.readFile(`${config.cwd}/yarn.lock`);
+
+    expect(is).toEqual(was);
+  });
+});
+
 test('creates the file in the mirror when fetching a git repository', async () => {
   await runInstall({}, 'install-git', async (config, reporter): Promise<void> => {
     const lockfile = await Lockfile.fromDirectory(config.cwd);
@@ -119,6 +128,25 @@ test.concurrent(
         expect(target).toEqual('../bar');
       } else {
         expect(target).toMatch(/[\\\/]bar[\\\/]$/);
+      }
+    });
+  },
+);
+
+test.concurrent(
+  'resolves the symlinks of other symlinked packages relative to the package using the link: protocol',
+  async () => {
+    await runInstall({}, 'install-link-nested', async (config): Promise<void> => {
+      const expectPath = path.join(config.cwd, 'node_modules', 'b');
+
+      const stat = await fs.lstat(expectPath);
+      expect(stat.isSymbolicLink()).toEqual(true);
+
+      const target = await fs.readlink(expectPath);
+      if (process.platform !== 'win32') {
+        expect(target).toEqual('../a/b');
+      } else {
+        expect(target).toMatch(/[\\\/]b[\\\/]$/);
       }
     });
   },
