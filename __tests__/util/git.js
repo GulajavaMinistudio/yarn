@@ -1,6 +1,12 @@
 /* @flow */
 
-jest.mock('../../src/util/child.js');
+jest.mock('../../src/util/child.js', () => {
+  const realChild = (require: any).requireActual('../../src/util/child.js');
+
+  realChild.spawn = jest.fn(() => Promise.resolve(''));
+
+  return realChild;
+});
 
 import Git from '../../src/util/git.js';
 import {spawn} from '../../src/util/child.js';
@@ -78,16 +84,19 @@ test('isCommitHash', () => {
 test('secureGitUrl', async function(): Promise<void> {
   const reporter = new NoopReporter();
 
-  let hasException = false;
+  const originalRepoExists = Git.repoExists;
   (Git: any).repoExists = jest.fn();
   Git.repoExists.mockImplementation(() => Promise.resolve(true)).mockImplementationOnce(() => {
     throw new Error('Non-existent repo!');
   });
+
+  let hasException = false;
   try {
     await Git.secureGitUrl(Git.npmUrlToGitUrl('http://fake-fake-fake-fake.com/123.git'), '', reporter);
   } catch (e) {
     hasException = true;
   }
+  (Git: any).repoExists = originalRepoExists;
   expect(hasException).toEqual(true);
 
   let gitURL = await Git.secureGitUrl(Git.npmUrlToGitUrl('http://github.com/yarnpkg/yarn.git'), '', reporter);
