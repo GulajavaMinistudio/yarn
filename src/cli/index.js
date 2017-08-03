@@ -20,7 +20,7 @@ const net = require('net');
 const onDeath = require('death');
 const path = require('path');
 
-export default function main({
+export function main({
   startArgs,
   args,
   endArgs,
@@ -300,6 +300,11 @@ export default function main({
     return errorReportLoc;
   }
 
+  const exit = exitCode => {
+    process.exitCode = exitCode || 0;
+    return reporter.close();
+  };
+
   config
     .init({
       binLinks: commander.binLinks,
@@ -331,9 +336,6 @@ export default function main({
         reporter.disableProgress();
       }
 
-      const exit = exitCode => {
-        process.exitCode = exitCode || 0;
-      };
       // verbose logs outputs process.uptime() with this line we can sync uptime to absolute time on the computer
       reporter.verbose(`current time: ${new Date().toISOString()}`);
 
@@ -367,7 +369,24 @@ export default function main({
         reporter.info(commands[commandName].getDocsInfo);
       }
 
-      reporter.close();
-      process.exitCode = 1;
+      return exit(1);
     });
+}
+
+export default function start() {
+  // ignore all arguments after a --
+  const doubleDashIndex = process.argv.findIndex(element => element === '--');
+  const startArgs = process.argv.slice(0, 2);
+  const args = process.argv.slice(2, doubleDashIndex === -1 ? process.argv.length : doubleDashIndex);
+  const endArgs = doubleDashIndex === -1 ? [] : process.argv.slice(doubleDashIndex + 1, process.argv.length);
+
+  main({startArgs, args, endArgs});
+}
+
+// When this module is compiled via Webpack, its child
+// count will be 0 since it is a single-file bundle.
+export const autoRun = module.children.length === 0;
+
+if (require.main === module) {
+  start();
 }

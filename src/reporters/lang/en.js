@@ -25,6 +25,11 @@ const messages = {
   clearedPackageFromCache: 'Cleared package $0 from cache',
   packWroteTarball: 'Wrote tarball to $0.',
 
+  helpExamples: '  Examples:\n$0\n',
+  helpCommands: '  Commands:\n$0\n',
+  helpCommandsMore: '  Run `$0` for more information on specific commands.',
+  helpLearnMore: '  Visit $0 to learn more about Yarn.\n',
+
   manifestPotentialTypo: 'Potential typo $0, did you mean $1?',
   manifestBuiltinModule: '$0 is also the name of a node core module',
   manifestNameDot: "Name can't start with a dot",
@@ -175,7 +180,8 @@ const messages = {
   binCommands: 'Commands available from binary scripts: ',
   possibleCommands: 'Project commands',
   commandQuestion: 'Which command would you like to run?',
-  commandFailed: 'Command failed with exit code $0.',
+  commandFailedWithCode: 'Command failed with exit code $0.',
+  commandFailedWithSignal: 'Command failed with signal $0.',
   packageRequiresNodeGyp:
     'This package requires node-gyp, which is not currently installed. Yarn will attempt to automatically install it. If this fails, you can run "yarn global add node-gyp" to manually install it.',
   nodeGypAutoInstallFailed:
