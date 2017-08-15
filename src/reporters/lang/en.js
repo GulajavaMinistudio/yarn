@@ -117,6 +117,10 @@ const messages = {
     'Pattern $0 is trying to unpack in the same destination $1 as pattern $2. This could result in a non deterministic behavior, skipping.',
   incorrectLockfileEntry: 'Lockfile has incorrect entry for $0. Ignoring it.',
 
+  invalidResolutionName: 'Resolution field $0 does not end with a valid package name and will be ignored',
+  invalidResolutionVersion: 'Resolution field $0 has an invalid version entry and may be ignored',
+  incompatibleResolutionVersion: 'Resolution field $0 is incompatible with requested version $1',
+
   yarnOutdated: "Your current version of Yarn is out of date. The latest version is $0 while you're on $1.",
   yarnOutdatedInstaller: 'To upgrade, download the latest installer at $0.',
   yarnOutdatedCommand: 'To upgrade, run the following command:',
@@ -318,6 +322,7 @@ const messages = {
   integrityLockfilesDontMatch: "Integrity check: Lock files don't match",
   integrityFailedFilesMissing: 'Integrity check: Files are missing',
   integrityPatternsDontMatch: "Integrity check: Top level patterns don't match",
+  integrityModulesFoldersMissing: 'Integrity check: Some module folders are missing',
   packageNotInstalled: '$0 not installed',
   optionalDepNotInstalled: 'Optional dependency $0 not installed',
   packageWrongVersion: '$0 is wrong version: expected $1, got $2',
