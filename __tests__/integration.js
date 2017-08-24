@@ -58,6 +58,15 @@ const PORT_RANGE = MAX_PORT_NUM - MIN_PORT_NUM;
 
 const getRandomPort = () => Math.floor(Math.random() * PORT_RANGE) + MIN_PORT_NUM;
 
+function runYarn(args: Array<string> = [], options: Object = {}): Promise<Array<Buffer>> {
+  const {stderr, stdout} = execa(path.resolve(__dirname, '../bin/yarn'), args, options);
+
+  const stdoutPromise = misc.consumeStream(stdout);
+  const stderrPromise = misc.consumeStream(stderr);
+
+  return Promise.all([stdoutPromise, stderrPromise]);
+}
+
 test('--mutex network', async () => {
   const cwd = await makeTemp();
   const cacheFolder = path.join(cwd, '.cache');
@@ -71,6 +80,48 @@ test('--mutex network', async () => {
     execa(command, ['add', 'left-pad'].concat(args), options),
     execa(command, ['add', 'foo'].concat(args), options),
   ]);
+});
+
+test('--cwd option', async () => {
+  const cwd = await makeTemp();
+  const cacheFolder = path.join(cwd, '.cache');
+
+  const subdir = path.join(cwd, 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i');
+  await fs.mkdirp(subdir);
+
+  const packageJsonPath = path.join(cwd, 'package.json');
+  await fs.writeFile(packageJsonPath, JSON.stringify({}));
+
+  await runYarn(['add', 'left-pad'], {cwd: subdir});
+
+  const packageJson = JSON.parse(await fs.readFile(packageJsonPath));
+  expect(packageJson.dependencies['left-pad']).toBeDefined();
+});
+
+test('yarnrc binary path (js)', async () => {
+  const cwd = await makeTemp();
+
+  await fs.writeFile(`${cwd}/.yarnrc`, 'yarn-path "./override.js"\n');
+  await fs.writeFile(`${cwd}/override.js`, 'console.log("override called")\n');
+
+  const [stdoutOutput] = await runYarn([], {cwd});
+  expect(stdoutOutput.toString().trim()).toEqual('override called');
+});
+
+test('yarnrc binary path (executable)', async () => {
+  const cwd = await makeTemp();
+
+  if (process.platform === 'win32') {
+    await fs.writeFile(`${cwd}/.yarnrc`, 'yarn-path "./override.cmd"\n');
+    await fs.writeFile(`${cwd}/override.cmd`, '@echo override called\n');
+  } else {
+    await fs.writeFile(`${cwd}/.yarnrc`, 'yarn-path "./override"\n');
+    await fs.writeFile(`${cwd}/override`, '#!/usr/bin/env sh\necho override called\n');
+    await fs.chmod(`${cwd}/override`, 0o755);
+  }
+
+  const [stdoutOutput] = await runYarn([], {cwd});
+  expect(stdoutOutput.toString().trim()).toEqual('override called');
 });
 
 // Windows could run these tests, but we currently suffer from an escaping issue that breaks them (#4135)
