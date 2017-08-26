@@ -108,7 +108,7 @@ const messages = {
   bugReport: 'If you think this is a bug, please open a bug report with the information provided in $0.',
   unexpectedError: 'An unexpected error occurred: $0.',
   jsonError: 'Error parsing JSON at $0, $1.',
-  noFilePermission: "We don't have permissions to touch the file $0.",
+  noPermission: 'Cannot create $0 due to insufficient permissions.',
   allDependenciesUpToDate: 'All of your dependencies are up to date.',
   legendColorsForUpgradeInteractive:
     'Color legend : \n $0    : Major Update backward-incompatible updates \n $1 : Minor Update backward-compatible features \n $2  : Patch Update backward-compatible bug fixes',
@@ -171,8 +171,8 @@ const messages = {
   workspacesPreferDevDependencies:
     "You're trying to add a regular dependency to a workspace root, which is probably a mistake (do you want to run this command inside a workspace?). If this dependency really should be in your workspace root, use the --dev flag to add it to your devDependencies.",
   workspacesRequirePrivateProjects: 'Workspaces can only be enabled in private projects',
-  workspaceExperimentalDisabled:
-    'The workspace feature is currently experimental and needs to be manually enabled - please add "workspaces-experimental true" to your .yarnrc file.',
+  workspacesDisabled:
+    'Your project root defines workspaces but the feature is disabled in your Yarn config. Please check "workspaces-experimental" in your .yarnrc file.',
   workspaceRootNotFound: "Cannot find the root of your workspace - are you sure you're currently in a workspace?",
   workspaceMissingWorkspace: 'Missing workspace name.',
   workspaceMissingCommand: 'Missing command name.',
@@ -348,6 +348,8 @@ const messages = {
   scopeNotValid: 'The specified scope is not valid.',
 
   deprecatedCommand: '$0 is deprecated. Please use $1.',
+  implicitFileDeprecated:
+    'Using the "file:" protocol implicitly is deprecated. Please either the protocol or prepend the path $0 with "./".',
 };
 
 export type LanguageKeys = $Keys<typeof messages>;
