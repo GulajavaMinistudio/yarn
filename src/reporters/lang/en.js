@@ -149,6 +149,13 @@ const messages = {
 
   cleaning: 'Cleaning modules',
   cleanCreatingFile: 'Creating $0',
+  cleanCreatedFile:
+    'Created $0. Please review the contents of this file then run "yarn autoclean --force" to perform a clean.',
+  cleanAlreadyExists: '$0 already exists. To revert to the default file, delete $0 then rerun this command.',
+  cleanRequiresForce:
+    'This command required the "--force" flag to perform the clean. This is a destructive operation. Files specified in $0 will be deleted.',
+  cleanDoesNotExist:
+    '$0 does not exist. Autoclean will delete files specified by $0. Run "autoclean --init" to create $0 with the default entries.',
 
   binLinkCollision:
     "There's already a linked binary called $0 in your global Yarn bin. Could not link this package's $0 bin entry.",
@@ -302,7 +309,8 @@ const messages = {
   requestError: 'Request $0 returned a $1',
   requestFailed: 'Request failed $0',
   tarballNotInNetworkOrCache: '$0: Tarball is not in network and can not be located in cache ($1)',
-  fetchBadHashWithPath: "Hashes don't match when extracting file $0. Expected $1 but got $2",
+  fetchBadHashWithPath:
+    'Fetch succeeded for $0. However, extracting $1 resulted in hash $2, which did not match the requested hash $3.',
   fetchErrorCorrupt:
     '$0. Mirror tarball appears to be corrupt. You can resolve this by running:\n\n  rm -rf $1\n  yarn install',
   errorDecompressingTarball: '$0. Error decompressing $1, it appears to be corrupt.',
