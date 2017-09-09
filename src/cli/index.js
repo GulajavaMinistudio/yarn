@@ -51,9 +51,9 @@ export function main({
   handleSignals();
 
   // set global options
-  commander.version(version, '--version');
+  commander.version(version, '-v, --version');
   commander.usage('[command] [flags]');
-  commander.option('-v, --verbose', 'output verbose messages on internal operations');
+  commander.option('--verbose', 'output verbose messages on internal operations');
   commander.option('--offline', 'trigger an error if any required dependencies are not available in local cache');
   commander.option('--prefer-offline', 'use network only if dependencies are not available in local cache');
   commander.option('--strict-semver');
@@ -107,7 +107,7 @@ export function main({
     commandName = 'help';
   }
 
-  if (args.indexOf('--help') >= 0 || args.indexOf('-h') >= 0) {
+  if (Object.prototype.hasOwnProperty.call(commands, commandName) && (args[0] === '--help' || args[0] === '-h')) {
     args.unshift(commandName);
     commandName = 'help';
   }
