@@ -411,7 +411,7 @@ export default class PackageLinker {
         topLevelDependencies,
         async ([dest, pkg]) => {
           if (pkg._reference && pkg._reference.location && pkg.bin && Object.keys(pkg.bin).length) {
-            const binLoc = path.join(this.config.cwd, this.config.getFolder(pkg));
+            const binLoc = path.join(this.config.lockfileFolder, this.config.getFolder(pkg));
             await this.linkSelfDependencies(pkg, dest, binLoc);
             tickBin();
           }
@@ -468,7 +468,7 @@ export default class PackageLinker {
 
         let peerError = 'unmetPeer';
         let resolvedLevelDistance = Infinity;
-        let resolvedPeerPkgPattern;
+        let resolvedPeerPkg;
         for (const peerPkg of peerPkgs) {
           const peerPkgRef = peerPkg._reference;
           if (!(peerPkgRef && peerPkgRef.patterns)) {
@@ -478,25 +478,31 @@ export default class PackageLinker {
           if (isFinite(levelDistance) && levelDistance < resolvedLevelDistance) {
             if (this._satisfiesPeerDependency(range, peerPkgRef.version)) {
               resolvedLevelDistance = levelDistance;
-              resolvedPeerPkgPattern = peerPkgRef.patterns;
-              this.reporter.verbose(
-                this.reporter.lang(
-                  'selectedPeer',
-                  `${pkg.name}@${pkg.version}`,
-                  `${peerDepName}@${peerPkgRef.version}`,
-                  peerPkgRef.level,
-                ),
-              );
+              resolvedPeerPkg = peerPkgRef;
             } else {
               peerError = 'incorrectPeer';
             }
           }
         }
 
-        if (resolvedPeerPkgPattern) {
-          ref.addDependencies(resolvedPeerPkgPattern);
+        if (resolvedPeerPkg) {
+          ref.addDependencies(resolvedPeerPkg.patterns);
+          this.reporter.verbose(
+            this.reporter.lang(
+              'selectedPeer',
+              `${pkg.name}@${pkg.version}`,
+              `${peerDepName}@${resolvedPeerPkg.version}`,
+              resolvedPeerPkg.level,
+            ),
+          );
         } else {
-          this.reporter.warn(this.reporter.lang(peerError, `${pkg.name}@${pkg.version}`, `${peerDepName}@${range}`));
+          this.reporter.warn(
+            this.reporter.lang(
+              peerError,
+              `${refTree.join(' > ')} > ${pkg.name}@${pkg.version}`,
+              `${peerDepName}@${range}`,
+            ),
+          );
         }
       }
     }
