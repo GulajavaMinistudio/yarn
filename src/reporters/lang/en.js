@@ -21,6 +21,7 @@ const messages = {
   waitingInstance: 'Waiting for the other yarn instance to finish (pid $0, inside $1)',
   waitingNamedInstance: 'Waiting for the other yarn instance to finish ($0)',
   offlineRetrying: 'There appears to be trouble with your network connection. Retrying...',
+  internalServerErrorRetrying: 'There appears to be trouble with the npm registry (returned $1). Retrying...',
   clearedCache: 'Cleared cache.',
   couldntClearPackageFromCache: "Couldn't clear package $0 from cache",
   clearedPackageFromCache: 'Cleared package $0 from cache',
@@ -348,12 +349,16 @@ const messages = {
   errorExtractingTarball: 'Extracting tar content of $1 failed, the file appears to be corrupt: $0',
   updateInstalling: 'Installing $0...',
   hostedGitResolveError: 'Error connecting to repository. Please, check the url.',
-  retryOnInternalServerError: 'There appears to be trouble with our server. Retrying...',
 
   unknownFetcherFor: 'Unknown fetcher for $0',
 
   downloadGitWithoutCommit: 'Downloading the git repo $0 over plain git without a commit hash',
   downloadHTTPWithoutCommit: 'Downloading the git repo $0 over HTTP without a commit hash',
+
+  unplugDisabled: "Packages can only be unplugged when Plug'n'Play is enabled.",
+
+  plugnplayWindowsSupport:
+    "Plug'n'Play is ignored on Windows for now - contributions welcome! https://github.com/yarnpkg/yarn/issues/6402",
 
   packageInstalledWithBinaries: 'Installed $0 with binaries:',
   packageHasBinaries: '$0 has binaries:',
