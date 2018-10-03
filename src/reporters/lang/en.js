@@ -108,7 +108,7 @@ const messages = {
   networkWarning:
     "You don't appear to have an internet connection. Try the --offline flag to use the cache for registry queries.",
   flatGlobalError:
-    'The package $0@$1 requires a flat dependency graph. Add `"flat": true` to your package.json and try again.',
+    'The package $0 requires a flat dependency graph. Add `"flat": true` to your package.json and try again.',
   noName: `Package doesn't have a name.`,
   noVersion: `Package doesn't have a version.`,
   answerRequired: 'An answer is required.',
@@ -357,8 +357,7 @@ const messages = {
 
   unplugDisabled: "Packages can only be unplugged when Plug'n'Play is enabled.",
 
-  plugnplayWindowsSupport:
-    "Plug'n'Play is ignored on Windows for now - contributions welcome! https://github.com/yarnpkg/yarn/issues/6402",
+  plugnplayWindowsSupport: "Plug'n'Play on Windows doesn't support the cache and project to be kept on separate drives",
 
   packageInstalledWithBinaries: 'Installed $0 with binaries:',
   packageHasBinaries: '$0 has binaries:',
@@ -408,6 +407,21 @@ const messages = {
   verboseUpgradeUnlocking: 'Unlocking $0 in the lockfile.',
   folderMissing: "Directory $0 doesn't exist",
   mutexPortBusy: 'Cannot use the network mutex on port $0. It is probably used by another app.',
+
+  auditRunning: 'Auditing packages',
+  auditSummary: '$0 vulnerabilities found - Packages audited: $1',
+  auditSummarySeverity: 'Severity:',
+  auditCritical: '$0 Critical',
+  auditHigh: '$0 High',
+  auditModerate: '$0 Moderate',
+  auditLow: '$0 Low',
+  auditInfo: '$0 Info',
+  auditResolveCommand: '# Run $0 to resolve $1 $2',
+  auditSemverMajorChange: 'SEMVER WARNING: Recommended action is a potentially breaking change',
+  auditManualReview:
+    'Manual Review\nSome vulnerabilities require your attention to resolve\n\nVisit https://go.npm.me/audit-guide for additional guidance',
+  auditRunAuditForDetails: 'Security audit found potential problems. Run "yarn audit" for additional details.',
+  auditOffline: 'Skipping audit. Security audit cannot be performed in offline mode.',
 };
 
 export type LanguageKeys = $Keys<typeof messages>;
