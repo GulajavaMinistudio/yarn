@@ -4,9 +4,17 @@ Please add one entry in this file for each change in Yarn's behavior. Use the sa
 
 ## Master
 
+- Implements `yarn policies set-version [range]`. Check [the documentation]() for usage & tips.
+
+  [#6673](https://github.com/yarnpkg/yarn/pull/6673) - [**Maël Nison**](https://twitter.com/arcanis)
+
 - Fixes a resolution issue when a package had an invalid `main` entry
 
   [#6682](https://github.com/yarnpkg/yarn/pull/6682) - [**Maël Nison**](https://twitter.com/arcanis)
+
+- Decreases the size of the generated `$PATH` environment variable for a better Windows support
+
+  [#6683](https://github.com/yarnpkg/yarn/issues/6683) - [**Rowan Lonsdale**](https://github.com/hWorblehat)
 
 ## 1.12.3
 
