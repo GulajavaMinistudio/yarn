@@ -4,6 +4,8 @@ Please add one entry in this file for each change in Yarn's behavior. Use the sa
 
 ## Master
 
+## 1.13.0
+
 - Implements a new `package.json` field: `peerDependenciesMeta`
 
   [#6671](https://github.com/yarnpkg/yarn/pull/6671) - [**Maël Nison**](https://twitter.com/arcanis)
@@ -27,6 +29,10 @@ Please add one entry in this file for each change in Yarn's behavior. Use the sa
 - Fixes postinstall scripts for third-party packages when they were referencing a binary from their own dependencies
 
   [#6712](https://github.com/yarnpkg/yarn/pull/6712) - [**Maël Nison**](https://twitter.com/arcanis)
+
+- Fixes yarn audit exit code overflow
+
+  [#6748](https://github.com/yarnpkg/yarn/issues/6748) - [**Andrey Vetlugin**](https://github.com/antrew)
 
 - Stops automatically unplugging packages with postinstall script when running under `--ignore-scripts`
 
