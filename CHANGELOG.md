@@ -4,6 +4,26 @@ Please add one entry in this file for each change in Yarn's behavior. Use the sa
 
 ## Master
 
+- Implements `yarn audit --groups group_name [group_name ...]`.
+
+  [#6724](https://github.com/yarnpkg/yarn/pull/6724) - [**Tom Milligan**](https://github.com/tommilligan)
+
+## 1.15.2
+
+The 1.15.1 doesn't exist due to a release hiccup.
+
+- Reverts a behavior causing boggus interactions between PowerShell and `yarn global`
+
+  [#6954](https://github.com/yarnpkg/yarn/pull/6954) - [**briman0094**](https://github.com/briman0094)
+
+- Fixes a bug where non-zero exit codes were converted to a generic 1 when running `yarn run`
+
+  [#6926](https://github.com/yarnpkg/yarn/pull/6926) - [**Kyle Fang**](https://github.com/zhigang1992)
+
+- Fixes production / development reporting when running `yarn audit`
+
+  [#6970](https://github.com/yarnpkg/yarn/pull/6970) - [**Adam Richardson**](https://github.com/as3richa)
+
 ## 1.15.0
 
 - Removes `--scripts-prepend-node-path` as Yarn's default behavior makes this obsolete

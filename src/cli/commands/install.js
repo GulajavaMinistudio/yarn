@@ -578,7 +578,7 @@ export class Install {
       });
     }
 
-    const audit = new Audit(this.config, this.reporter);
+    const audit = new Audit(this.config, this.reporter, {groups: constants.OWNED_DEPENDENCY_TYPES});
     let auditFoundProblems = false;
 
     steps.push((curr: number, total: number) =>
@@ -608,6 +608,7 @@ export class Install {
           const mergedManifest = Object.assign({}, ...Object.values(preparedManifests).map(m => m.object));
           const auditVulnerabilityCounts = await audit.performAudit(
             mergedManifest,
+            this.lockfile,
             this.resolver,
             this.linker,
             topLevelPatterns,
