@@ -4,6 +4,10 @@ Please add one entry in this file for each change in Yarn's behavior. Use the sa
 
 ## Master
 
+- Implements `yarn audit --level [severity]` flag to filter the audit command's output.
+
+[#6716](https://github.com/yarnpkg/yarn/pull/6716) - [**Rogério Vicente**](https://twitter.com/rogeriopvl)
+
 - Implements `yarn audit --groups group_name [group_name ...]`.
 
   [#6724](https://github.com/yarnpkg/yarn/pull/6724) - [**Tom Milligan**](https://github.com/tommilligan)
@@ -81,6 +85,14 @@ The 1.15.1 doesn't exist due to a release hiccup.
 - Packages won't be auto-unplugged anymore if `ignore-scripts` is set in the yarnrc file
 
   [#6983](https://github.com/yarnpkg/yarn/pull/6983) - [**Micha Reiser**](https://github.com/MichaReiser)
+  
+- Enables displaying Emojis on [Terminus](https://github.com/Eugeny/terminus) by default
+
+  [#7093](https://github.com/yarnpkg/yarn/pull/7093) - [**David Refoua**](https://github.com/DRSDavidSoft)
+
+- Run the engines check before executing `run` scripts.
+
+  [#7013](https://github.com/yarnpkg/yarn/issues/7013) - [**Eloy Durán**](https://github.com/alloy)
 
 ## 1.14.0
 
