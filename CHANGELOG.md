@@ -4,6 +4,8 @@ Please add one entry in this file for each change in Yarn's behavior. Use the sa
 
 ## Master
 
+## 1.18.0
+
 - Suggests using the Yarn 2 development trunk on PnP-enabled projects
 
   [#7512](https://github.com/yarnpkg/yarn/pull/7512) - [**Maël Nison**](https://twitter.com/arcanis)
